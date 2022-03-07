@@ -86,19 +86,35 @@ dropdown_timeframe.grid(row=3, column=1, sticky=NSEW, padx=35, pady= 10)
 time_label = Label(window, text='in last(hour, day, week, month, year, all[all max is 5 yr])')
 time_label.grid(row=3, column=0, sticky=NSEW, padx=35, pady= 10)
 
+#result limit
 
-##
+##result limit list:
+rangelist = list(range(1,101))
+
+limit_input_variable = StringVar()
+limit_input_variable.set(rangelist[-1])
+
+    #result limit combobox
+dropdown_result_limit = Combobox(
+    window,
+    values=rangelist,
+    textvariable=limit_input_variable,
+    state='readonly',
+    justify='center'
+)
 
 result_label = Label(window, text='result limit?(default/max=100)')
 result_label.grid(row=4, column=0, sticky=NSEW, padx=35, pady= 10)
 
-result_limit_box = Entry(window, width=20, justify=['center'])
-result_limit_box.grid(row=4, column=1, sticky=NSEW, padx=35, pady= 10)
+dropdown_result_limit.grid(row=4, column=1, sticky=NSEW, padx=35, pady= 10)
+
+
+
 
 ##run search button:
 btn = Button(window, 
             text='Run Search:',
-            command=lambda: reddit_mod.main(subred_box.get(), keyword_box.get(), sort_input_variable.get() , timeframe_input_variable.get(), result_limit_box.get()),
+            command=lambda: reddit_mod.main(subred_box.get(), keyword_box.get(), sort_input_variable.get() , timeframe_input_variable.get(), limit_input_variable.get()),
             relief=RAISED)
     
 btn.grid(row=5, columnspan=2, sticky=NSEW, padx=35, pady= 20)

@@ -54,19 +54,11 @@ def main(search_subred, search_str, search_sort_str, search_time, result_limit):
 
 ##result limit
 
-    if result_limit == '':
-        result_limit = 100
-
     result_limit_int = int(result_limit)
-
-    if result_limit_int != range(0, 101):
-        result_limit = 100
 
 
 
     top_post_df = pd.DataFrame(data=[], columns=['Title', 'score', 'subred', 'text', 'created on'])
-
-
 
 
     subred_relevance = reddit_read.subreddit(search_subred).search(search_str)
@@ -84,36 +76,39 @@ def main(search_subred, search_str, search_sort_str, search_time, result_limit):
 
     #main loop
     x = 1
+
     for post in search_sort:
 
 
-        p_title = post.title
-        p_score = post.score
-        p_subred = post.subreddit
-        p_data = post.selftext
-        p_time = post.created
-        p_date_post =datetime.utcfromtimestamp(p_time)
+            p_title = post.title
+            p_score = post.score
+            p_subred = post.subreddit
+            p_data = post.selftext
+            p_time = post.created
+            p_date_post =datetime.utcfromtimestamp(p_time)
 
-       #date time loop 
-        date_search = datetime.date(search_time)
-        date_post = datetime.date(p_date_post)
+            #date time loop 
+            date_search = datetime.date(search_time)
+            date_post = datetime.date(p_date_post)
 
-        if date_post > date_search:
+    
 
-            post_info =[p_title, p_score, p_subred, p_data, p_date_post]
+            if date_post > date_search and x <= result_limit_int:
 
-            with open('redditinfo.csv', 'w'):
+                post_info =[p_title, p_score, p_subred, p_data, p_date_post]
+
             
-                    top_post_df.loc[len(top_post_df.index)] = post_info
-                    top_post_df.to_csv('redditinfo.csv')
 
-                    title_char_limit = p_title[:50]
+                with open('redditinfo.csv', 'w'):
 
-                    print(x, '!', p_date_post, ':', p_subred, '::', title_char_limit, '...')
-                    x = x + 1
-        
-                    if x == result_limit + 1:
-                        break
-                    
-    #results summary
+                        top_post_df.loc[len(top_post_df.index)] = post_info
+                        top_post_df.to_csv('redditinfo.csv')
+
+                        title_char_limit = p_title[:50]
+
+                        print(x, '!', p_date_post, ':', p_subred, '::', title_char_limit, '...')
+                        x = x + 1
+
+                        
+                        
     print('', x-1, 'posts found with title containing search: ', search_str, '. In subreddit:', search_subred, 'sorted by: ', search_sort_str,  'In timeframe: from', search_time, 'to', time_now)
