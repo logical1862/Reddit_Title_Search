@@ -1,5 +1,8 @@
+from msilib.schema import ComboBox
+from secrets import choice
 from tkinter import *
-import reddit_mod as rm
+from tkinter.ttk import Combobox
+import reddit_mod 
 
 
 window = Tk()
@@ -25,32 +28,77 @@ keyword_label.grid(row=1, column=0, sticky=NSEW, padx=35, pady= 10)
 
 keyword_box = Entry(window, width=20, justify=['center'])
 keyword_box.grid(row=1, column=1, sticky=NSEW, padx=35, pady= 10)
-##
-sort_label = Label(window, text='sort by[relevance, top, hot, new (default = relevance)] ')
+
+##user sort choice:
+
+sort_option_list = [
+    'relevance',
+    'top',
+    'hot',
+    'new'
+]
+
+    #sort combobox
+sort_input_variable = StringVar()
+sort_input_variable.set(sort_option_list[0])
+
+dropdown_sort = Combobox(
+    window,
+    values = sort_option_list,
+    textvariable= sort_input_variable,
+    state='readonly',
+    justify='center'
+    )
+
+
+
+dropdown_sort.grid(row=2, column=1, sticky=NSEW,padx=35, pady= 10 )
+
+    #sort text label
+sort_label = Label(window, text='sort by[relevance, top, hot, new] ')
 sort_label.grid(row=2, column=0, sticky=NSEW)
 
-sort_box = Entry(window, width=20, justify=['center'])
-sort_box.grid(row=2, column=1, sticky=NSEW, padx=35, pady= 10)
- 
-##
+##user timeframe choice:
+timeframe_option_list = [
+    'hour',
+    'day',
+    'week',
+    'month',
+    'year',
+    'all'
+]
+
+    #timeframe combobox
+timeframe_input_variable = StringVar()
+timeframe_input_variable.set(timeframe_option_list[0])
+
+dropdown_timeframe = Combobox(
+    window,
+    values=timeframe_option_list,
+    textvariable= timeframe_input_variable,
+    state='readonly',
+    justify='center'
+    )
+
+dropdown_timeframe.grid(row=3, column=1, sticky=NSEW, padx=35, pady= 10)
+
+    #timeframe text label
 time_label = Label(window, text='in last(hour, day, week, month, year, all[all max is 5 yr])')
 time_label.grid(row=3, column=0, sticky=NSEW, padx=35, pady= 10)
 
 
-timeframe_box = Entry(window, width=20, justify=['center'])
-timeframe_box.grid(row=3, column=1, sticky=NSEW, padx=35, pady= 10)
-
 ##
+
 result_label = Label(window, text='result limit?(default/max=100)')
 result_label.grid(row=4, column=0, sticky=NSEW, padx=35, pady= 10)
 
 result_limit_box = Entry(window, width=20, justify=['center'])
 result_limit_box.grid(row=4, column=1, sticky=NSEW, padx=35, pady= 10)
 
-##
+##run search button:
 btn = Button(window, 
             text='Run Search:',
-            command=lambda: rm.main(subred_box.get(), keyword_box.get(), sort_box.get(), timeframe_box.get(), result_limit_box.get()),
+            command=lambda: reddit_mod.main(subred_box.get(), keyword_box.get(), sort_input_variable.get() , timeframe_input_variable.get(), result_limit_box.get()),
             relief=RAISED)
     
 btn.grid(row=5, columnspan=2, sticky=NSEW, padx=35, pady= 20)
