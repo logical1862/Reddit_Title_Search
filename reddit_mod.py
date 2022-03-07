@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 
-def main(search_subred, search_str, search_sort, search_time, result_limit):
+def main(search_subred, search_str, search_sort_str, search_time, result_limit):
 
     reddit_read = praw.Reddit('title_search')
 
@@ -67,11 +67,12 @@ def main(search_subred, search_str, search_sort, search_time, result_limit):
     top_post_df = pd.DataFrame(data=[], columns=['Title', 'score', 'subred', 'text', 'created on'])
 
 
+
+
     subred_relevance = reddit_read.subreddit(search_subred).search(search_str)
-    subred_sorted = reddit_read.subreddit(search_subred).search(search_str, sort=search_sort)
+    subred_sorted = reddit_read.subreddit(search_subred).search(search_str, sort=search_sort_str)
 
-
-    if search_sort == 'top' or 'hot' or 'new':
+    if search_sort_str == 'top' or 'hot' or 'new':
         search_sort = subred_sorted
 
     else:
@@ -114,8 +115,5 @@ def main(search_subred, search_str, search_sort, search_time, result_limit):
                     if x == result_limit + 1:
                         break
                     
-    print('', x-1, 'posts found with title containing search: ', search_str, '. In subreddit:', search_subred, '.  In timeframe: from', search_time, 'to', time_now)
-
-
-
-
+    #results summary
+    print('', x-1, 'posts found with title containing search: ', search_str, '. In subreddit:', search_subred, 'sorted by: ', search_sort_str,  'In timeframe: from', search_time, 'to', time_now)
