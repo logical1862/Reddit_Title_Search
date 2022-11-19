@@ -34,23 +34,8 @@ def main(search_subred, search_str, search_sort_str, search_time, result_limit):
 
     time_dic = {'hour':hour_result, 'day':day_result, 'week':week_result, 'month':month_result, 'year':year_result, 'all':all_result}
 
-    if search_time == 'hour':
-        search_time = time_dic.get('hour')
-
-    elif search_time == 'day':
-        search_time = time_dic.get('day')
-
-    elif search_time == 'week':
-        search_time = time_dic.get('week')
-
-    elif search_time == 'month':
-        search_time = time_dic.get('month')
-
-    elif search_time == 'year':
-        search_time = time_dic.get('year')
-
-    else:
-        search_time = time_dic.get('all') 
+    search_time = time_dic.get(search_time)
+    
 
 ##result limit
 
