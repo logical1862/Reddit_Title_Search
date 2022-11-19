@@ -3,34 +3,58 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 
-def main(search_subred, search_str, search_sort_str, search_time, result_limit):
+def search_timeframe():
+    """
+    Returns a dictionary of timeframes to search by.   
+    """
+    time_now = datetime.utcnow()
+    time_dict = {
+        'hour': time_now - timedelta(hours=1), 
+        'day': time_now - timedelta(days=1),
+        'week': time_now - timedelta(days=7),
+        'month': time_now - timedelta(weeks=4),
+        'year': time_now  - timedelta(weeks=52),
+        'all': time_now - timedelta(weeks=260)
+        }
+    return time_dict
 
+def post_data_list(post):
+        """
+        given a reddit post in the praw module format, returns a list of information about the post 
+        [title, score, subreddit, text_content, date posted]
+        """
+        
+        return [
+            R'{}'.format(post.title), # format string for possible escape code 
+            post.subreddit,
+            post.score,            
+            str(post.selftext),
+            datetime.date(datetime.fromtimestamp(post.created))
+            ]
+
+def save_to_csv(df: pd.DataFrame):
+    """
+    saves a given pandas DataFrame object to a .csv file in the cwd with title 'redditinfo.csv'
+    """
+    path='redditinfo.csv'
+    with open(path, 'w', encoding='utf-8') as f:              
+        df.to_csv(f, index=False, line_terminator='\n')
+        f.close()
+
+def main(search_subred, search_str, search_sort_str, search_time, result_limit:int):
+    # initialize praw instance with info in praw config file
     reddit_read = praw.Reddit('title_search')
 
-
-    print('---------------------------')
-    print('reddit post keyword search:')
-    print('---------------------------')
-
-
-    if search_subred == '':
-        search_subred = 'all'
-
-
+    ## alert user to missing parameter and prompt for re-entry in terminal window
     while search_str == '':
         print('error: you must enter a keyword to search')
         search_str = input('keyword?: ')
 
-
-##define search time 
-    time_now = datetime.utcnow()
-    hour_result = datetime.utcnow() - timedelta(hours=1)
-    day_result = datetime.utcnow() - timedelta(days=1)
-    week_result = datetime.utcnow() - timedelta(days=7)
-    month_result = datetime.utcnow() - timedelta(weeks=4)
-    year_result = datetime.utcnow() - timedelta(days=365)
-    all_result = datetime.utcnow() - timedelta(weeks=260)
+    # set api call params based on input
+    if search_subred == '':
+        search_subred = 'all'
     
+<<<<<<< HEAD
 
     time_dic = {'hour':hour_result, 'day':day_result, 'week':week_result, 'month':month_result, 'year':year_result, 'all':all_result}
 
@@ -49,51 +73,54 @@ def main(search_subred, search_str, search_sort_str, search_time, result_limit):
     subred_relevance = reddit_read.subreddit(search_subred).search(search_str)
     subred_sorted = reddit_read.subreddit(search_subred).search(search_str, sort=search_sort_str)
 
+=======
+>>>>>>> 00db45da7293554fa7129bbfe13f29b783a19cca
     if search_sort_str == 'top' or 'hot' or 'new':
-        search_sort = subred_sorted
+        search_sort = reddit_read.subreddit(search_subred).search(search_str, sort=search_sort_str)
 
     else:
-        search_sort = subred_relevance
+        search_sort = reddit_read.subreddit(search_subred).search(search_str)
 
+    #run and print query results
+    print(
+        """ 
+    ---------------------------
+    reddit post keyword search:
+    ---------------------------
+            """
+    )
+    print(f'with credentials: {reddit_read.user.me()} :\n')
+    print('result.) posted date : subreddit :: title\n')
 
-#run and print results
-    print('with credentials:', reddit_read.user.me(), ':')
-
-    #main loop
-    x = 1
-
+    top_post_df = pd.DataFrame(data=[], columns=['title', 'subreddit', 'score', 'text', 'created on'])
+    x = 0
     for post in search_sort:
+        post_info = post_data_list(post)
+        title = post_info[0]
+        title_char_limit = title[:50]
+        subreddit = post_info[1]
+        post_date = post_info[4]
 
-
-            p_title = post.title
-            p_score = post.score
-            p_subred = post.subreddit
-            p_data = post.selftext
-            p_time = post.created
-            p_date_post =datetime.utcfromtimestamp(p_time)
-
-            #date time loop 
-            date_search = datetime.date(search_time)
-            date_post = datetime.date(p_date_post)
-
+        #get timeframe for query
+        time_dict = search_timeframe()
+        search_date = datetime.date(time_dict[search_time])
     
+        # if post date is within parameters 
+        if post_date > search_date:
+            # append dataframe
+            top_post_df.loc[(len(top_post_df.index) - 1)] = post_info
 
-            if date_post > date_search and x <= result_limit_int:
+            print(f'{x+1}.) {post_date} : {subreddit} :: {title_char_limit}...')
 
-                post_info =[p_title, p_score, p_subred, p_data, p_date_post]
+            # break loop if query limit reached
+            x += 1
+            if x == int(result_limit):
+                break
 
-            
-
-                with open('redditinfo.csv', 'w'):
-
-                        top_post_df.loc[len(top_post_df.index)] = post_info
-                        top_post_df.to_csv('redditinfo.csv')
-
-                        title_char_limit = p_title[:50]
-
-                        print(x, '!', p_date_post, ':', p_subred, '::', title_char_limit, '...')
-                        x = x + 1
-
+    # open/append csv file with post data
+    save_to_csv(top_post_df)
                         
-                        
-    print('', x-1, 'posts found with title containing search: ', search_str, '. In subreddit:', search_subred, 'sorted by: ', search_sort_str,  'In timeframe: from', search_time, 'to', time_now)
+    print( f"\n--> {x} posts found with title matching search: '{search_str}'. \nIn subreddit: '{search_subred}'. \nSorted by: '{search_sort_str}' \nIn the past '{search_time}'.")
+
+   
+ 
