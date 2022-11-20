@@ -3,10 +3,12 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 
-def search_timeframe():
+def search_timeframe(timeframe: str):
     """
     Returns a dictionary of timeframes to search by.   
+    TODO: needs error checking
     """
+
     time_now = datetime.utcnow()
     time_dict = {
         'hour': time_now - timedelta(hours=1), 
@@ -16,7 +18,7 @@ def search_timeframe():
         'year': time_now  - timedelta(weeks=52),
         'all': time_now - timedelta(weeks=260)
         }
-    return time_dict
+    return time_dict.get(timeframe)
 
 def post_data_list(post):
         """
@@ -41,6 +43,9 @@ def save_to_csv(df: pd.DataFrame):
         df.to_csv(f, index=False, line_terminator='\n')
         f.close()
 
+
+
+
 def main(search_subred, search_str, search_sort_str, search_time, result_limit:int):
     # initialize praw instance with info in praw config file
     reddit_read = praw.Reddit('title_search')
@@ -54,14 +59,9 @@ def main(search_subred, search_str, search_sort_str, search_time, result_limit:i
     if search_subred == '':
         search_subred = 'all'
     
-<<<<<<< HEAD
 
-    time_dic = {'hour':hour_result, 'day':day_result, 'week':week_result, 'month':month_result, 'year':year_result, 'all':all_result}
-
-    search_time = time_dic.get(search_time)
+    search_time = search_timeframe(search_time)
     
-
-##result limit
 
     result_limit_int = int(result_limit)
 
@@ -73,8 +73,6 @@ def main(search_subred, search_str, search_sort_str, search_time, result_limit:i
     subred_relevance = reddit_read.subreddit(search_subred).search(search_str)
     subred_sorted = reddit_read.subreddit(search_subred).search(search_str, sort=search_sort_str)
 
-=======
->>>>>>> 00db45da7293554fa7129bbfe13f29b783a19cca
     if search_sort_str == 'top' or 'hot' or 'new':
         search_sort = reddit_read.subreddit(search_subred).search(search_str, sort=search_sort_str)
 
@@ -102,8 +100,8 @@ def main(search_subred, search_str, search_sort_str, search_time, result_limit:i
         post_date = post_info[4]
 
         #get timeframe for query
-        time_dict = search_timeframe()
-        search_date = datetime.date(time_dict[search_time])
+        
+        search_date = datetime.date(search_time)
     
         # if post date is within parameters 
         if post_date > search_date:
