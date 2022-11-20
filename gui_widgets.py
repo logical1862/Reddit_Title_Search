@@ -6,7 +6,6 @@ import reddit_mod
 
 
 class search_window():
-
     window = Tk()
     window.grid()
 
@@ -27,10 +26,10 @@ class search_window():
         'all'
     ]
     # limit results range
-    range_list = list(range(1,100))
+    range_list = list(range(100,1, -1))
 
     def __init__(self, title:str):
-        self.title = title
+        self.window.title(title)
         
         #labels
 
