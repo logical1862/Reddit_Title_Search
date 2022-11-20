@@ -2,10 +2,15 @@
 
 from tkinter import *
 from tkinter.ttk import Combobox
-import reddit_mod 
+import reddit_mod
 
 
-class search_window():
+class SearchWindow():
+    """
+    Initializes a tkinter window
+    Set the window title at initialization
+    gui_widgets.SearchWindow('This is the title of the window')
+    """
     window = Tk()
     window.grid()
 
@@ -30,9 +35,7 @@ class search_window():
 
     def __init__(self, title:str):
         self.window.title(title)
-        
         #labels
-
         subred_label = Label(self.window, text='search what subreddits?(default = all)')
         subred_label.grid(row=0, column=0, sticky=NSEW, padx=35, pady= 10)
 
@@ -41,8 +44,9 @@ class search_window():
 
         sort_label = Label(self.window, text='sort by[relevance, top, hot, new] ')
         sort_label.grid(row=2, column=0, sticky=NSEW)
-        
-        time_label = Label(self.window, text='in last(hour, day, week, month, year, all[all max is 5 yr])')
+
+        time_label_text = 'in last(hour, day, week, month, year, all[all max is 5 yr])'
+        time_label = Label(self.window, text=time_label_text)
         time_label.grid(row=3, column=0, sticky=NSEW, padx=35, pady= 10)
 
         result_label = Label(self.window, text='result limit?(default/max=100)')
@@ -52,7 +56,7 @@ class search_window():
 
         subreddit_entry_box = Entry(self.window, width=20, justify=['center'])
         subreddit_entry_box.grid(row=0, column=1, sticky=NSEW, padx=35, pady= 10)
-        
+
         keyword_entry_box = Entry(self.window, width=20, justify=['center'])
         keyword_entry_box.grid(row=1, column=1, sticky=NSEW, padx=35, pady= 10)
 
@@ -94,12 +98,13 @@ class search_window():
 
 
         # run search button:
-        btn = Button(self.window, 
+        btn = Button(self.window,
                     text='Run Search:',
-                    command=lambda: reddit_mod.main(subreddit_entry_box.get(), keyword_entry_box.get(), sort_choice_dropdown.get() , timeframe_choice_dropdown.get(), result_limit_dropdown.get()),
+                    command=lambda: reddit_mod.main(
+                        subreddit_entry_box.get(),
+                        keyword_entry_box.get(), sort_choice_dropdown.get(),
+                        timeframe_choice_dropdown.get(),
+                        result_limit_dropdown.get()
+                        ),
                     relief=RAISED)
-            
         btn.grid(row=5, columnspan=2, sticky=NSEW, padx=35, pady= 20)
-
-
-
